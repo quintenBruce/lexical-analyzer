@@ -25,7 +25,7 @@ static int lexLen;
 static FILE *in_fp;
 
 /* Local Function declarations */
-static void addChar();
+static void addChar(); //append char to lexeme
 static void getChar();
 static void getNonBlank();
 
@@ -33,10 +33,9 @@ static void getNonBlank();
 /* main driver */
 int main() 
 {
-    /* Open the input data file and process its contents */
-    if ((in_fp = fopen("front.in", "r")) == NULL) {
+    if ((in_fp = fopen("front.in", "r")) == NULL) 
         printf("ERROR - cannot open front.in \n");
-    } else {
+    else {
         getChar();
         do {
             lex();
@@ -52,31 +51,37 @@ int main()
 static int lookup(char ch) {
     switch (ch) {
         case '(':
-            addChar();
             nextToken = LEFT_PAREN;
             break;
         case ')':
-            addChar();
             nextToken = RIGHT_PAREN;
             break;
         case '+':
-            addChar();
             nextToken = ADD_OP;
             break;
         case '-':
-            addChar();
             nextToken = SUB_OP;
             break;
         case '*':
-            addChar();
             nextToken = MULT_OP;
             break;
         case '/':
-            addChar();
             nextToken = DIV_OP;
             break;
+        case '<':
+            nextToken = DIV_OP;
+            break;
+        case '>':
+            nextToken = DIV_OP;
+            break;
+        case '=':
+            nextToken = DIV_OP;
+            break;
+        case ';':
+            nextToken = DIV_OP;
+            break;
+            
         default:
-            addChar();
             nextToken = EOF;
             break;
     }
@@ -89,9 +94,9 @@ static void addChar() {
     if (lexLen <= 98) {
         lexeme[lexLen++] = nextChar;
         lexeme[lexLen] = 0;
-    } else {
+    } else 
         printf("Error - lexeme is too long \n");
-    }
+    
 }
 
 /*****************************************************/
@@ -99,14 +104,14 @@ static void addChar() {
  * character class */
 static void getChar() {
     if ((nextChar = getc(in_fp)) != EOF) {
-        if (isalpha(nextChar))
+        if (isalpha(nextChar)) //checks if char is a-z or A-Z
             charClass = LETTER;
-        else if (isdigit(nextChar))
+        else if (isdigit(nextChar)) //checks if 0-9
             charClass = DIGIT;
         else charClass = UNKNOWN;
-    } else {
+    } else 
         charClass = EOF;
-    }
+    
 }
 
 /*****************************************************/
@@ -122,14 +127,14 @@ static void getNonBlank() {
 int lex() {
     lexLen = 0;
     getNonBlank();
+    addChar(); //append char to lexeme
 
     switch (charClass) {
         /* Parse identifiers */
         case LETTER:
-            addChar();
             getChar();
             while (charClass == LETTER || charClass == DIGIT) {
-                addChar();
+                addChar(); //append char to lexeme
                 getChar();
             }
             nextToken = IDENT;
@@ -137,10 +142,9 @@ int lex() {
 
         /* Parse integer literals */
         case DIGIT:
-            addChar();
             getChar();
             while (charClass == DIGIT) {
-                addChar();
+                addChar(); //append char to lexeme
                 getChar();
             }
             nextToken = INT_LIT;
@@ -160,9 +164,9 @@ int lex() {
             lexeme[2] = 'F';
             lexeme[3] = 0;
             break;
-    } /* End of switch */
+    }
 
     printf("Next token is: %d, Next lexeme is %s\n", nextToken, lexeme);
     return nextToken;
-} /* End of function lex */
+}
 
