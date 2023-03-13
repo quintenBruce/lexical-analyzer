@@ -61,7 +61,7 @@ int lex();
 
 /******************************************************/
 /*main driver */
-int main()
+int main(int argc, char *argv[])
 {
     printf("DCooke Analyzer :: R11703344\n");
     if ((in_fp = fopen("front.in", "r")) == NULL)
