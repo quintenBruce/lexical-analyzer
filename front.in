@@ -2,9 +2,9 @@ f := 15;
 i := 11;
 
 read(n);
-while (f > i)
+while (f >! i)
 do
-	n := i + 5656656;
+	n := i + f;
 	f--;
 	i++
 od
