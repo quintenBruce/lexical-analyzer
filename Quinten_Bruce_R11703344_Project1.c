@@ -1,25 +1,48 @@
-/**
- *This the example lexical analyzer code in pages 173 - 177 of the
- *textbook,
- *
- *Sebesta, R. W. (2012). Concepts of Programming Languages.
- *Pearson, 10th edition.
- *
+/*
+    Quinten Bruce
+    R11703344
  */
 
 /*front.c - a lexical analyzer system for simple arithmetic expressions */
 #include <stdio.h>
-
 #include <ctype.h>
-
 #include <string.h>
 
-#include "front.h"
 
-#include "parser.h"
+/* Character classes */
+#define LETTER 0
+#define DIGIT 1
+#define UNKNOWN 99
+
+/* Token codes */
+#define INT_LIT "INT_LIT"
+#define IDENT "IDENT"
+
+#define ADD_OP "ADD_OP"
+#define SUB_OP "SUB_OP"
+#define MULT_OP "MULT_OP"
+#define DIV_OP "DIV_OP"
+#define LEFT_PAREN "LEFT_PAREN"
+#define RIGHT_PAREN "RIGHT_PAREN"
+#define ASSIGN_OP "ASSIGN_OP"
+#define NEQUAL_OP "NEQUAL_OP"
+#define LEQUAL_OP "LEQUAL_OP"
+#define GEQUAL_OP "GEQUAL_OP"
+#define INC_OP "INC_OP"
+#define DEC_OP "DEC_OP"
+#define KEY_READ "KEY_READ"
+#define KEY_WRITE "KEY_WRITE"
+#define KEY_WHILE "KEY_WHILE"
+#define KEY_DO "KEY_DO"
+#define KEY_OD "KEY_OD"
+#define LESSER_OP "LESSER_OP"
+#define GREATER_OP "GREATER_OP"
+#define EQUAL_OP "EQUAL_OP"
+#define SEMICOLON "SEMICOLON"
+
 
 /*Global Variable */
-int nextToken;
+int* nextToken;
 
 /*Local Variables */
 static int charClass;
@@ -32,20 +55,22 @@ static FILE *in_fp;
 static void addChar(); // append char to lexeme
 static void getChar();
 static void getNonBlank();
+int lex();
+
+
 
 /******************************************************/
 /*main driver */
 int main()
 {
+    printf("DCooke Analyzer :: R11703344\n");
     if ((in_fp = fopen("front.in", "r")) == NULL)
         printf("ERROR - cannot open front.in \n");
     else
     {
         getChar();
         do
-        {
-            lex();
-        } while (nextToken != EOF);
+            lex(); while (nextToken != EOF);
     }
 
     return 0;
@@ -289,9 +314,9 @@ int lex()
         lexeme[1] = 'O';
         lexeme[2] = 'F';
         lexeme[3] = 0;
-        break;
+        return -1;
     }
 
-    printf("Next token is: %d, Next lexeme is %s\n", nextToken, lexeme);
+    printf("%s   %s\n", lexeme, nextToken);
     return nextToken;
 }

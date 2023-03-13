@@ -1,14 +1,11 @@
-all: parser
+EXECS=dcooke_analyzer
+CC=gcc
+MYFILE=Quinten_Bruce_R11703344_Project1.c
 
-parser: front.o parser.o
-	$(CC) -Wall front.o parser.o -o parser	
+all: ${EXECS}
 
-.c.o:
-	$(CC) -Wall -c $<
-
-
-test: parser front.in
-	./parser
+${EXECS}: ${MYFILE}
+	${CC} -o ${EXECS} ${MYFILE}
 
 clean:
-	$(RM) parser.o front.o parser
+	rm -f ${EXECS}
