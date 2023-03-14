@@ -1,0 +1,25 @@
+f := 15;
+i := 11;
+
+read(n);
+while (f >! i)
+do
+	n := i + f;
+	f--;
+	i++
+od;
+
+
+t:=n;
+while (t != i)
+do
+	t++:
+od;
+
+x:=t;
+while (x == i)
+do
+	x++;
+	i--
+od;
+write(&)
