@@ -7,4 +7,19 @@ do
 	n := i + f;
 	f--;
 	i++
-od
+od;
+
+
+t:=n;
+while (t != i)
+do
+	t++:
+od;
+
+x:=t;
+while (x == i)
+do
+	x++;
+	i--
+od;
+write(&)

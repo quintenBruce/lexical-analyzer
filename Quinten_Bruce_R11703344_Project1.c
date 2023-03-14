@@ -1,25 +1,23 @@
 /*
-    Quinten Bruce
-    R11703344
- */
+*    Name: Quinten Bruce
+*    R#: R11703344
+*    Project: CS3361 Project #1
+*
+*    Description: a lexical analyzer system for a predifined grammar
+*/
 
-/*front.c - a lexical analyzer system for simple arithmetic expressions */
 #include <stdio.h>
-
 #include <ctype.h>
-
 #include <string.h>
 
-
-/* Character classes */
+/* Character Classes */
 #define LETTER "LETTER"
 #define DIGIT "DIGIT"
 #define UNKNOWN "UNKNOWN"
 
-/* Token codes */
+/* Token Codes */
 #define INT_LIT "INT_LIT"
 #define IDENT "IDENT"
-
 #define ADD_OP "ADD_OP"
 #define SUB_OP "SUB_OP"
 #define MULT_OP "MULT_OP"
@@ -42,50 +40,85 @@
 #define EQUAL_OP "EQUAL_OP"
 #define SEMICOLON "SEMICOLON"
 
-/*Global Variable */
-int * nextToken;
+/* Global Variable */
+int *nextToken;
 
-/*Local Variables */
+/* Local Variables */
 static int charClass;
 static char lexeme[100];
 static char nextChar;
 static int lexLen;
-static FILE * in_fp;
+static FILE *in_fp;
 
-/*Local Function declarations */
+/* Function Declarations */
 static void addChar(); // append char to lexeme
 static void getChar();
 static void getNonBlank();
 int lex();
 
+
 /******************************************************/
-/*main driver */
-int main(int argc, char * argv[]) {
+
+
+/* main driver */
+int main(int argc, char *argv[])
+{
     printf("DCooke Analyzer :: R11703344\n");
-    //if ((in_fp = fopen(argv[1], "r")) == NULL)
-    if ((in_fp = fopen("front.in", "r")) == NULL)
+    //if ((in_fp = fopen("front.in", "r")) == NULL) //for debugging local input files
+    if ((in_fp = fopen(argv[1], "r")) == NULL) 
         printf("ERROR - cannot open front.in \n");
-    else {
+    else
+    {
         getChar();
         do
-            lex(); while (nextToken != EOF);
+        {
+            lex();
+        } while (nextToken != EOF);
     }
-
     return 0;
 }
 
-/*****************************************************/
-/*lookup - a function to lookup operators and parentheses and return the
- *token */
-static void lookup() {
+
+/* lookupDoubleCharOp - a function to lookup double character operators and return the token */
+static int lookupDoubleCharOp(char a, char b)
+{
+    char op[2];
+    op[0] = a;
+    op[1] = b;
+
+    if ((strncmp("!=", op, 2) == 0))
+        return NEQUAL_OP;
+    else if ((strncmp("<=", op, 2) == 0))
+        return LEQUAL_OP;
+    else if ((strncmp(">=", op, 2) == 0))
+        return GEQUAL_OP;
+    else if ((strncmp("++", op, 2) == 0))
+        return INC_OP;
+    else if ((strncmp(":=", op, 2) == 0))
+        return ASSIGN_OP;
+    else if ((strncmp("--", op, 2) == 0))
+        return DEC_OP;
+    return UNKNOWN;
+}
+// postcodition: function will return the matching token code or 
+// the UNKOWN token code if no mathing token is found
+
+
+
+/* lookup - a function to lookup operators and parentheses and return the token */
+static void lookup()
+{
     char ch = lexeme[0];
-    if (isalpha(ch) && lexLen == 1) {
+    if (isalpha(ch) && lexLen == 1)
+    {
         nextToken = LETTER;
         return;
     }
 
-    if (lexLen == 1) {
-        switch (ch) {
+    if (lexLen == 1)
+    {
+        switch (ch)
+        {
         case '(':
             nextToken = LEFT_PAREN;
             break;
@@ -120,7 +153,9 @@ static void lookup() {
             nextToken = UNKNOWN;
             break;
         }
-    } else {
+    }
+    else
+    {
         if ((strncmp("!=", lexeme, lexLen) == 0) && (strcmp("!=", lexeme) == 0))
             nextToken = NEQUAL_OP;
         else if ((strncmp("<=", lexeme, lexLen) == 0) && (strcmp("<=", lexeme) == 0))
@@ -147,149 +182,144 @@ static void lookup() {
             nextToken = UNKNOWN;
     }
 }
+// postcodition: nextToken will be assigned to matching token code or 
+// the UNKOWN token code if no mathing token is found
 
-static int lookupDoubleCharOp(char a, char b) {
-    char op[2];
-    op[0] = a;
-    op[1] = b;
 
-    if ((strncmp("!=", op, 2) == 0))
-        return NEQUAL_OP;
-    else if ((strncmp("<=", op, 2) == 0))
-        return LEQUAL_OP;
-    else if ((strncmp(">=", op, 2) == 0))
-        return GEQUAL_OP;
-    else if ((strncmp("++", op, 2) == 0))
-        return INC_OP;
-    else if ((strncmp(":=", op, 2) == 0))
-        return ASSIGN_OP;
-    else if ((strncmp("--", op, 2) == 0))
-        return DEC_OP;
-    return UNKNOWN;
-}
 
-/*****************************************************/
-/*addChar - a function to add nextChar to lexeme */
-static void addChar() {
-    if (lexLen <= 98) {
+/* addChar - a function to add nextChar to lexeme */
+static void addChar()
+{
+    if (lexLen <= 98)
+    {
         lexeme[lexLen++] = nextChar;
         lexeme[lexLen] = 0;
-    } else
+    }
+    else
         printf("Error - lexeme is too long \n");
 }
+// postcondition: nextChar will be appended to lexeme. 
+// null character (0) will be set at approppriate position.
 
-/*****************************************************/
-/*getChar - a function to get the next character of input and determine its
- *character class */
-static void getChar() {
-    if ((nextChar = getc(in_fp)) != EOF) {
+
+
+/* getChar - a function to get the next character of input and determine its character class */
+static void getChar()
+{
+    if ((nextChar = getc(in_fp)) != EOF)
+    {
         if (isalpha(nextChar)) // checks if char is a-z or A-Z
             charClass = LETTER;
         else if (isdigit(nextChar)) // checks if 0-9
             charClass = DIGIT;
         else
             charClass = UNKNOWN;
-    } else
+    }
+    else
         charClass = EOF;
 }
+// postcodition: nextChar will be assigned to next character in file stream.
+// charClass will be appropriately assigned a token code
 
-/*****************************************************/
-/*getNonBlank - a function to call getChar until it returns a non-whitespace
- *character */
-static void getNonBlank() {
+
+
+/* getNonBlank - a function to call getChar until it returns a non-whitespace character */
+static void getNonBlank()
+{
     while (isspace(nextChar))
         getChar();
 }
 
-/*****************************************************/
-/*lex - a simple lexical analyzer for arithmetic expressions */
-int lex() {
-    lexLen = 0;
+
+
+/* lex - a lexical analyzer */
+int lex()
+{
+    lexLen = 0; // 'reset' lexeme array
     getNonBlank();
+    addChar();
 
-    addChar(); // append char to lexeme
-    /*Parse identifiers */
-    if (charClass == LETTER) {
-
+    /*** Parse Identifiers ***/
+    if (charClass == LETTER)
+    {
         getChar();
-        while (charClass == LETTER) {
-            addChar(); // append char to lexeme
+        while (charClass == LETTER)
+        {
+            addChar();
             getChar();
         }
 
-        if (charClass == DIGIT) {
-            while (charClass == DIGIT || charClass == LETTER) {
+        if (charClass == DIGIT) // invalid identifier...must be UNKNOWN
+        { 
+            while (charClass == DIGIT || charClass == LETTER)
+            {
                 addChar();
                 getChar();
             }
 
             nextToken = UNKNOWN;
-        } else {
+        }
+        else
+        {
             lookup();
             if (nextToken == UNKNOWN || nextToken == LETTER)
                 nextToken = IDENT;
         }
-
     }
 
-    /*Parse integer literals */
-    else if (charClass == DIGIT) {
+    /*** Parse Integer Literals ***/
+    else if (charClass == DIGIT)
+    {
         getChar();
-        while (charClass == DIGIT) {
-            addChar(); // append char to lexeme 
+        while (charClass == DIGIT)
+        {
+            addChar(); 
             getChar();
         }
 
-        if (charClass == LETTER) {
-            while (charClass == DIGIT || charClass == LETTER) {
+        if (charClass == LETTER) // invalid digit.... must be UNKNOWN
+        { 
+            while (charClass == DIGIT || charClass == LETTER)
+            {
                 addChar();
                 getChar();
             }
-
             nextToken = UNKNOWN;
-          
-        } else {
-            nextToken = INT_LIT;
-
-        }
+        } else
+            nextToken = INT_LIT; 
     }
 
-    /*Parentheses and operators */
-    else if (charClass == UNKNOWN) {
+    /*** Parse Parentheses and Operators ***/
+    else if (charClass == UNKNOWN)
+    {
         lookup();
-        int flag = nextToken != UNKNOWN; //bool value 1 if char is a valid single char lexeme
 
         char a = nextChar;
         getChar();
 
-        if (charClass == UNKNOWN && !isspace(nextChar)) {
+        if (charClass == UNKNOWN && !isspace(nextChar)) // next character is not a space, letter, or number. 
+        {
             char b = nextChar;
-            int class = lookupDoubleCharOp(a, b);
-            if (class != UNKNOWN) {
-                nextToken == class;
+            int charPairTokenCode = lookupDoubleCharOp(a, b); 
+            if (charPairTokenCode != UNKNOWN) // double char lexeme is a recognized token.
+            {
+                nextToken = charPairTokenCode;
                 addChar();
                 getChar();
-            } else {
-                if (!flag) {
-                    nextToken == UNKNOWN;
-                    addChar();
-                    getChar();
-                }
             }
-        }
-        lookup();
+        } else // double char is not a recognized token. 
+            lookup();
     }
 
-    /*EOF */
-    else if (charClass == EOF) {
+    /*** EOF ***/
+    else if (charClass == EOF)
+    {
         nextToken = EOF;
-        lexeme[0] = 'E';
-        lexeme[1] = 'O';
-        lexeme[2] = 'F';
-        lexeme[3] = 0;
-        return -1;
+        return -1; 
     }
 
     printf("%s    %s\n", lexeme, nextToken);
     return nextToken;
 }
+// postcondtion: function will print out the next lexeme and corrosponding token name and 
+// will return the token name.
