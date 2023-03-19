@@ -1,25 +1,11 @@
-f := 15;
-i := 11;
+x:=0;
+i:=1;
 
-read(n);
-while (f >! i)
+while (x + 1 = i)
 do
-	n := i + f;
-	f--;
-	i++
+	read(a);
+	s := s + a;
+	++i
 od;
 
-
-t:=n;
-while (t != i)
-do
-	t++:
-od;
-
-x:=t;
-while (x == i)
-do
-	x++;
-	i--
-od;
-write(&)
+write(s)
