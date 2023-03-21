@@ -3,60 +3,8 @@
 *    R#: R11703344
 *    Project: CS3361 Project #1
 *
-*    Description: a lexical analyzer system for a predifined grammar
+*    Description: a syntax parser system for a predifined grammar
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-
-NEXT Step is to test this program against the input files from project 1
-
-
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #include <stdio.h>
 #include <ctype.h>
@@ -106,11 +54,20 @@ static int lexLen;
 static FILE *in_fp;
 
 /* Function Declarations */
-static void addChar(); // append char to lexeme
+static void addChar();
 static void getChar();
 static void getNonBlank();
 int lex();
-static int program();
+static int P();
+static int S();
+static int C();
+static int E();
+static int E_PRIME();
+static int T();
+static int T_PRIME();
+static int F();
+static int O();
+static int V();
 
 
 /******************************************************/
@@ -120,14 +77,23 @@ static int program();
 int main(int argc, char *argv[])
 {
     printf("DCooke Parser :: RR11703344\n");
-    if ((in_fp = fopen("front.in", "r")) == NULL) //for debugging local input files
-    //if ((in_fp = fopen(argv[1], "r")) == NULL) 
-        printf("ERROR - cannot open front.in \n");
-    else
-    {
+    if ((sizeof(argv) / sizeof(char*)) <= 1 && 1 == 2) { //CHANGE CONDITIONAL BEOFRE SUBMITTING PLEASE-----------------------------------------------------------------------------
+        printf("No file provided as a command line argument");
+        return 2;
+    }
+    else if ((in_fp = fopen("front.in", "r")) == NULL) { //for debugging local input files
+        printf("ERROR - cannot open input file \n");
+        return 3;
+    } 
+    // else if ((in_fp = fopen(argv[1], "r")) == NULL)  {
+    //     printf("ERROR - cannot open input file \n");
+    //     return 3;
+    // }
+        
+    else {
         getChar();
         lex();
-        int status = program();
+        int status = P();
 
         if (status == PASS && (nextToken == -1)) {
             printf("Syntax Validated");
@@ -386,109 +352,21 @@ int lex()
 // postcondtion: function will print out the next lexeme and corrosponding token name and 
 // will return the token name.
 
-int F_NONTERM() {
-    if (nextToken == LEFT_PAREN) {
-        if (expression() == PASS) {
-            lex();
-            if (nextToken == RIGHT_PAREN) {
-                return PASS;
-            } else
-                return ERROR;
-        } else 
-            return ERROR;
-    }
-    else if (nextToken == INC_OP || nextToken == DEC_OP) {
-        return O_NONTERM();
-    }
-    else if (nextToken == IDENT) {
-        return PASS;
-    }
-    else if (nextToken == INT_LIT) {
-        return PASS;
-    }
-    else {
-        return ERROR;
-    }
+
+
+
+int P() {
+    return S();
 }
 
-int T_NONTERM_PRIME() {
-    if (nextToken == MULT_OP || nextToken == DIV_OP) {
-        lex();
-         if (F_NONTERM() == PASS) {
-            return T_NONTERM_PRIME();
-         } else    
-            return ERROR;
-    } else
-        return PASS;
-}
-
-int T_NONTERM() {
-    if (F_NONTERM() == PASS) {
-        if (T_NONTERM_PRIME() == PASS) {
-            return PASS;
-        } else 
-            return ERROR;
-    } else
-        return ERROR;
-}
-
-int expression_prime() {
-    if (nextToken == ADD_OP || nextToken == DEC_OP) {
-        lex();
-         if (T_NONTERM() == PASS) {
-            lex();
-            return expression_prime();
-         } else    
-            return ERROR;
-    } else
-        return PASS;
-}
-
-int expression() {
-    if (T_NONTERM() == PASS) {
-        lex();
-        if (expression_prime() == PASS) {
-            return PASS;
-        } else 
-            return ERROR;
-    } else
-        return ERROR;
-}
-
-
-int variable() {
-    if (nextToken == IDENT) {
-        lex();
-        return PASS;
-    }
-    return ERROR;
-}
-
-int C_NONTERM() {
-    lex();
-    if (expression() == PASS) {
-        if (nextToken == LESSER_OP || nextToken == GREATER_OP || nextToken == EQUAL_OP || nextToken == NEQUAL_OP || nextToken == LEQUAL_OP || nextToken == GEQUAL_OP) {
-            lex();
-            return expression();
-        }
-    } else 
-        return ERROR;
-}
-
-int O_NONTERM() {
-    lex();
-    return variable();
-}
- 
-
-int statement() {
-    if (variable() == PASS) {
+int S() {
+    if (V() == PASS) {
         if (nextToken == ASSIGN_OP) {
             lex();
-            if (expression() == PASS) {
+            if (E() == PASS) {
                     if (nextToken == SEMICOLON) {
                         lex();
-                        return statement();
+                        return S();
                     } else
                         return PASS;
             } else
@@ -500,40 +378,39 @@ int statement() {
         lex();
         if (nextToken == LEFT_PAREN) {
             lex();
-            if (variable() == PASS) {
+            if (V() == PASS) {
                 if (nextToken == RIGHT_PAREN) {
                     lex();
                     if (nextToken == SEMICOLON) {
                         lex();
-                        return statement();
+                        return S();
                     } else
                         return PASS;
-                }
-                else    
+                } else    
                     return ERROR;
-            } 
-            else 
+            } else 
                 return ERROR;
         }
     }
     else if (nextToken == KEY_WHILE) {
         lex();
         if (nextToken == LEFT_PAREN) {
-            if (C_NONTERM() == PASS) {
+            lex();
+            if (C() == PASS) {
                 if (nextToken == RIGHT_PAREN) {
                     lex();
                     if (nextToken == KEY_DO) {
                         lex();
-                        if (statement() == PASS) {
+                        if (S() == PASS) {
                             if (nextToken == KEY_OD) {
                                 lex();
                                 if (nextToken == SEMICOLON) {
                                     lex();
-                                    return statement();
+                                    return S();
                                 } else
                                     return PASS;
                             } else
-                            return ERROR;
+                                return ERROR;
                         } else 
                             return ERROR;
                     } else
@@ -542,14 +419,14 @@ int statement() {
                     return ERROR;
             } else
                 return ERROR;
-        }
-       
+        } else
+            return ERROR;
     }
     else if (nextToken == INC_OP || nextToken == DEC_OP) {
-        if (O_NONTERM() == PASS) {
+        if (O() == PASS) {
             if (nextToken == SEMICOLON) {
                 lex();
-                return statement();
+                return S();
             } else
                 return PASS;
         } else
@@ -557,12 +434,75 @@ int statement() {
     }
 }
 
-int program() {
-    return statement();
+int C() {
+    if (E() == PASS) {
+        if (nextToken == LESSER_OP || nextToken == GREATER_OP || nextToken == EQUAL_OP || nextToken == NEQUAL_OP || nextToken == LEQUAL_OP || nextToken == GEQUAL_OP) {
+            lex();
+            return E();
+        }
+    } else 
+        return ERROR;
 }
 
+int F() {
+    if (nextToken == LEFT_PAREN) {
+        if (E() == PASS) {
+            lex();
+            return nextToken == RIGHT_PAREN ? PASS : ERROR;
+        } else 
+            return ERROR;
+    }
+    else if (nextToken == INC_OP || nextToken == DEC_OP) 
+        return O();
+    else if (nextToken == IDENT) 
+        return PASS;
+    else if (nextToken == INT_LIT) 
+        return PASS;
+    else 
+        return ERROR;
+}
 
+int E_PRIME() {
+    if (nextToken == ADD_OP || nextToken == DEC_OP) {
+        lex();
+         if (T() == PASS) {
+            lex();
+            return E_PRIME();
+         } else    
+            return ERROR;
+    } else
+        return PASS;
+}
 
+int E() {
+    if (T() == PASS) {
+        lex();
+        return E_PRIME();
+    } else
+        return ERROR;
+}
 
+int T_PRIME() {
+    if (nextToken == MULT_OP || nextToken == DIV_OP) {
+        lex();
+        return F() == PASS ? T_PRIME() : ERROR;
+    } else
+        return PASS;
+}
 
+int T() {
+    return F() == PASS ? T_PRIME(): ERROR;
+}
 
+int V() {
+    if (nextToken == IDENT) {
+        lex();
+        return PASS;
+    }
+    return ERROR;
+}
+
+int O() {
+    lex();
+    return V();
+}
