@@ -1,6 +1,5 @@
 /*
 *    Name: Quinten Bruce
-*    R#: R11703344
 *    Project: CS3361 Project #1
 *
 *    Description: a syntax parser system for a predifined grammar
