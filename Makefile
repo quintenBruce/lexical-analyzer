@@ -1,6 +1,6 @@
 EXECS=dcooke_analyzer
 CC=gcc
-MYFILE=Quinten_Bruce_R11703344_Project1.c
+MYFILE=Quinten_Project1.c
 
 all: ${EXECS}
 
